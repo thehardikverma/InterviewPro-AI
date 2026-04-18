@@ -1,0 +1,6 @@
+node_modules/
+uploads/
+*.pdf
+*.webm
+.env
+.git/
