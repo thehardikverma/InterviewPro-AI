@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura - Basic Instantly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #9b51e0;
+            --secondary: #ff758c;
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        /* Animated Background Gradients */
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 10s infinite linear;
+        }
+
+        .blob-1 {
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            top: -100px;
+            left: -100px;
+        }
+
+        .blob-2 {
+            background: linear-gradient(135deg, var(--secondary), #ff7eb3);
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            33% { transform: translate(30px, -50px) rotate(120deg) scale(1.1); }
+            66% { transform: translate(-20px, 20px) rotate(240deg) scale(0.9); }
+            100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes fadeUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .card h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: translateZ(30px);
+        }
+
+        .card p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #cbd5e1;
+            transition: color 0.3s ease;
+            transform: translateZ(20px);
+        }
+        
+        .card:hover p {
+            color: #f1f5f9;
+        }
+
+        /* Dynamic Button */
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 10px 20px -10px rgba(155, 81, 224, 0.5);
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            text-decoration: none;
+            transform: translateZ(40px);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn:hover {
+            transform: translateZ(50px) translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 25px -10px rgba(255, 117, 140, 0.6);
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn:active {
+            transform: translateZ(40px) translateY(1px) scale(0.98);
+        }
+        
+        /* Interactive element */
+        .interactive-zone {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.4);
+            position: relative;
+            transform: translateZ(10px);
+        }
+        
+        #time-display {
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="card" id="main-card">
+        <h1>Hello World</h1>
+        <p>This is an elegantly crafted basic webpage, engineered instantly with dynamic animations and beautiful glassmorphism.</p>
+        <button class="btn" id="magic-btn">
+            <span>Discover Magic</span>
+        </button>
+        <div class="interactive-zone">
+            Local Time
+            <span id="time-display">00:00:00</span>
+        </div>
+    </div>
+
+    <script>
+        // Interactive 3D tilt effect for the card
+        const card = document.getElementById('main-card');
+        
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 30;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 30;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        // Reset transform
+        document.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            card.style.transition = 'transform 0.5s ease';
+        });
+
+        // Remove transition during hover to make it snappy
+        document.addEventListener('mouseenter', () => {
+            card.style.transition = 'none';
+        });
+
+        // Button interaction
+        const magicBtn = document.getElementById('magic-btn');
+        magicBtn.addEventListener('click', () => {
+            // Ripple effect or change text
+            const textSpan = magicBtn.querySelector('span');
+            textSpan.innerText = textSpan.innerText === "Discover Magic" ? "Magic Activated ✨" : "Discover Magic";
+            
+            // Jello animation equivalent
+            card.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            card.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                card.style.transform = 'scale(1)';
+                setTimeout(() => {
+                    card.style.transition = 'none';
+                }, 300);
+            }, 150);
+        });
+
+        // Live Clock
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('time-display').innerText = timeString;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

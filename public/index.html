@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InterviewPro — AI Video Interview Practice</title>
+  <meta name="description" content="Practice video interviews with AI-generated questions, smart document analysis, automatic recording, and intelligent performance feedback.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+  <!-- ═══ API Key Modal ═══ -->
+  <div id="api-key-overlay" class="api-key-overlay">
+    <div class="api-key-modal glass-card">
+      <div class="api-key-header">
+        <div class="logo-badge" style="margin: 0 auto 16px;">
+          <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+            <rect x="4" y="8" width="40" height="28" rx="4" stroke="url(#lg1k)" stroke-width="2.5"/>
+            <circle cx="24" cy="22" r="6" stroke="url(#lg1k)" stroke-width="2"/>
+            <path d="M16 40L24 34L32 40" stroke="url(#lg1k)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="36" cy="14" r="3" fill="#ef4444"/>
+            <defs>
+              <linearGradient id="lg1k" x1="0" y1="0" x2="48" y2="48">
+                <stop stop-color="#6366f1"/>
+                <stop offset="1" stop-color="#a855f7"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h2>Welcome to InterviewPro</h2>
+        <p class="api-key-desc">Enter your free <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Groq API Key</a> to power the AI engine. Your key stays in your browser and is never sent to any server.</p>
+      </div>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label for="groq-api-key-input">Groq API Key</label>
+        <input type="password" id="groq-api-key-input" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="api-key-actions">
+        <label class="toggle-switch" style="margin-bottom: 12px;">
+          <input type="checkbox" id="save-key-checkbox" checked>
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Remember key in this browser</span>
+        </label>
+        <button id="save-api-key-btn" class="btn-primary btn-large" style="width:100%;">
+          <span class="btn-shimmer"></span>
+          <span class="btn-content">
+            <span class="btn-icon">🔑</span>
+            Connect & Start
+          </span>
+        </button>
+      </div>
+      <p class="api-key-hint">Don't have a key? <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Get one free from Groq →</a></p>
+    </div>
+  </div>
+
+
+  <!-- ═══ Animated Background ═══ -->
+  <div class="bg-decoration" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-pattern"></div>
+  </div>
+
+  <!-- ═══════════════ SETUP SCREEN ═══════════════ -->
+  <div id="setup-screen" class="screen active">
+    <div class="setup-container">
+      <div class="logo-section">
+        <div class="logo-badge">
+          <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+            <rect x="4" y="8" width="40" height="28" rx="4" stroke="url(#lg1)" stroke-width="2.5"/>
+            <circle cx="24" cy="22" r="6" stroke="url(#lg1)" stroke-width="2"/>
+            <path d="M16 40L24 34L32 40" stroke="url(#lg1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="36" cy="14" r="3" fill="#ef4444"/>
+            <defs>
+              <linearGradient id="lg1" x1="0" y1="0" x2="48" y2="48">
+                <stop stop-color="#6366f1"/>
+                <stop offset="1" stop-color="#a855f7"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h1 class="logo-title">InterviewPro</h1>
+        <p class="logo-subtitle">AI-Powered Video Interview Practice</p>
+      </div>
+
+      <div class="setup-card glass-card">
+        <!-- Mode Toggle -->
+        <div class="mode-toggle" id="mode-toggle">
+          <button class="mode-btn active" data-mode="ai" id="mode-ai-btn">
+            <span class="mode-icon">✨</span> AI Generated
+          </button>
+          <button class="mode-btn" data-mode="custom" id="mode-custom-btn">
+            <span class="mode-icon">✏️</span> Custom Questions
+          </button>
+          <div class="mode-slider" id="mode-slider"></div>
+        </div>
+
+        <!-- AI Mode Fields -->
+        <div id="ai-fields">
+          <div class="form-group">
+            <label for="topic">Interview Topic, Role, or Instructions</label>
+            <input type="text" id="topic" placeholder="e.g., Senior React Developer  ·  Ask me about system design  ·  Quiz me on JavaScript closures" autocomplete="off">
+            <p class="field-hint">Enter a job role, topic, or tell the AI exactly what to ask you.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="interview-type">Interview Type</label>
+            <div class="select-wrapper">
+              <select id="interview-type">
+                <option value="technical">🔧 Technical</option>
+                <option value="behavioral">🧠 Behavioral (STAR Method)</option>
+                <option value="hr">💼 HR / General</option>
+                <option value="mixed" selected>🎯 Mixed (Recommended)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Document Upload -->
+          <div class="form-group">
+            <label>Reference Document <span class="optional">(optional)</span></label>
+            <div class="doc-upload-zone" id="doc-upload-zone">
+              <input type="file" id="doc-file-input" accept=".pdf,.txt,.md,.doc,.docx,.csv,.json,.rtf" hidden>
+              <div class="doc-upload-idle" id="doc-upload-idle">
+                <div class="doc-upload-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                    <line x1="12" y1="18" x2="12" y2="12"/>
+                    <line x1="9" y1="15" x2="12" y2="12"/>
+                    <line x1="15" y1="15" x2="12" y2="12"/>
+                  </svg>
+                </div>
+                <p class="doc-upload-text">Drag & drop your document here</p>
+                <p class="doc-upload-hint">or <span class="doc-browse-link">browse files</span></p>
+                <div class="doc-formats">
+                  <span class="format-badge">PDF</span>
+                  <span class="format-badge">DOCX</span>
+                  <span class="format-badge">TXT</span>
+                  <span class="format-badge">MD</span>
+                  <span class="format-badge">CSV</span>
+                  <span class="format-badge">JSON</span>
+                </div>
+              </div>
+              <div class="doc-upload-active hidden" id="doc-upload-active">
+                <div class="doc-file-info">
+                  <div class="doc-file-icon">📄</div>
+                  <div class="doc-file-details">
+                    <span class="doc-file-name" id="doc-file-name">document.pdf</span>
+                    <span class="doc-file-size" id="doc-file-size">2.4 MB</span>
+                  </div>
+                  <button class="doc-remove-btn" id="doc-remove-btn" title="Remove document">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+                <div class="doc-status" id="doc-status">
+                  <span class="doc-status-dot"></span>
+                  <span class="doc-status-text" id="doc-status-text">Parsed successfully</span>
+                </div>
+              </div>
+            </div>
+            <p class="doc-help-text">Upload your resume, job description, study notes, or Q&A material. AI will use it to create smarter, more targeted questions.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="context">Additional Prompt <span class="optional">(optional)</span></label>
+            <textarea id="context" rows="3" placeholder="Add specific requirements, your experience level, technologies you know, the company culture..."></textarea>
+          </div>
+        </div>
+
+        <!-- Custom Mode Fields -->
+        <div id="custom-fields" class="hidden">
+          <div class="form-group">
+            <label for="custom-topic">Interview Topic</label>
+            <input type="text" id="custom-topic" placeholder="e.g., React Developer Interview" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="custom-questions">Your Questions <span class="optional">(one per line)</span></label>
+            <textarea id="custom-questions" rows="8" placeholder="Tell me about yourself and your experience.&#10;What is your greatest strength?&#10;Describe a challenging project you worked on.&#10;Where do you see yourself in 5 years?&#10;Why should we hire you?"></textarea>
+          </div>
+        </div>
+
+        <!-- Shared Settings -->
+        <div class="settings-section">
+          <h3 class="settings-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Session Settings
+          </h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Questions: <span class="accent" id="q-count-label">8</span></label>
+              <input type="range" id="question-count" min="3" max="20" value="8" class="range-input">
+            </div>
+            <div class="form-group">
+              <label for="answer-time">Answer Time</label>
+              <div class="select-wrapper">
+                <select id="answer-time">
+                  <option value="5">5 seconds (Speed Round ⚡)</option>
+                  <option value="30">30 seconds</option>
+                  <option value="60" selected>1 minute</option>
+                  <option value="90">1.5 minutes</option>
+                  <option value="120">2 minutes</option>
+                  <option value="180">3 minutes</option>
+                  <option value="300">5 minutes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="prep-time">Prep Time per Question</label>
+              <div class="select-wrapper">
+                <select id="prep-time">
+                  <option value="0">No prep time</option>
+                  <option value="5">5 seconds</option>
+                  <option value="10">10 seconds</option>
+                  <option value="30" selected>30 seconds</option>
+                  <option value="60">1 minute</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="shuffle-questions">Shuffle Order</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="shuffle-questions" checked>
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Randomize</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button id="start-btn" class="btn-primary btn-large">
+          <span class="btn-shimmer"></span>
+          <span class="btn-content">
+            <span class="btn-icon">🚀</span>
+            Generate Questions & Start
+          </span>
+        </button>
+      </div>
+
+      <p class="powered-by">Powered by Groq AI · LLaMA 3.3 · Your API Key · <a href="#" id="change-api-key-link" style="color:var(--accent);text-decoration:underline;cursor:pointer;">Change Key</a></p>
+    </div>
+  </div>
+
+  <!-- ═══════════════ LOADING SCREEN ═══════════════ -->
+  <div id="loading-screen" class="screen">
+    <div class="loading-container">
+      <div class="loading-orb">
+        <div class="orb-ring"></div>
+        <div class="orb-ring"></div>
+        <div class="orb-ring"></div>
+        <div class="orb-core">✨</div>
+      </div>
+      <h2 class="loading-title">Crafting Your Interview</h2>
+      <p class="loading-subtitle" id="loading-subtitle">Our AI is generating personalized questions...</p>
+      <div class="loading-bar">
+        <div class="loading-bar-fill"></div>
+      </div>
+      <div class="loading-steps" id="loading-steps">
+        <div class="loading-step active">Analyzing topic</div>
+        <div class="loading-step">Generating questions</div>
+        <div class="loading-step">Calibrating difficulty</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ CAMERA CHECK SCREEN ═══════════════ -->
+  <div id="camera-screen" class="screen">
+    <div class="camera-container">
+      <h2 class="screen-title">Camera & Microphone Check</h2>
+      <p class="screen-subtitle">Make sure everything looks and sounds great</p>
+
+      <div class="camera-layout">
+        <div class="camera-preview-wrapper glass-card">
+          <video id="camera-preview" autoplay muted playsinline></video>
+          <div class="camera-overlay">
+            <div class="face-guide"></div>
+          </div>
+          <div class="audio-meter">
+            <div class="audio-meter-label">🎤 Mic Level</div>
+            <div class="audio-meter-track">
+              <div id="audio-level" class="audio-meter-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="camera-sidebar">
+          <div class="device-status glass-card">
+            <div class="status-item" id="camera-status">
+              <span class="status-dot checking"></span>
+              <span class="status-text">Camera: Checking...</span>
+            </div>
+            <div class="status-item" id="mic-status">
+              <span class="status-dot checking"></span>
+              <span class="status-text">Microphone: Checking...</span>
+            </div>
+          </div>
+
+          <div class="interview-summary glass-card">
+            <h3>📋 Interview Summary</h3>
+            <div class="summary-item">
+              <span class="summary-label">Topic</span>
+              <span class="summary-value" id="summary-topic">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Questions</span>
+              <span class="summary-value" id="summary-questions">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Answer Time</span>
+              <span class="summary-value" id="summary-answer-time">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Prep Time</span>
+              <span class="summary-value" id="summary-prep-time">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Est. Duration</span>
+              <span class="summary-value" id="summary-duration">—</span>
+            </div>
+            <div class="summary-item" id="summary-doc-row" style="display:none">
+              <span class="summary-label">Document</span>
+              <span class="summary-value" id="summary-doc">—</span>
+            </div>
+          </div>
+
+          <div class="camera-tips glass-card">
+            <h4>💡 Quick Tips</h4>
+            <ul>
+              <li>Look directly at the camera</li>
+              <li>Ensure good lighting on your face</li>
+              <li>Sit in a quiet environment</li>
+              <li>Keep a neutral background</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <button id="ready-btn" class="btn-primary btn-large" disabled>
+        <span class="btn-shimmer"></span>
+        <span class="btn-content">
+          <span class="btn-icon">🎬</span>
+          I'm Ready — Start Interview
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ INTERVIEW SCREEN ═══════════════ -->
+  <div id="interview-screen" class="screen">
+    <div class="interview-container">
+      <!-- Header -->
+      <div class="interview-header">
+        <div class="interview-progress">
+          <span class="progress-text" id="question-progress">Question 1 / 8</span>
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+        <div class="phase-badge" id="interview-phase">
+          <span class="phase-dot"></span>
+          <span class="phase-text">PREPARING</span>
+        </div>
+        <button class="btn-icon-only" id="end-interview-btn" title="End Interview">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Question Panel -->
+      <div class="question-panel glass-card">
+        <div class="question-meta">
+          <span class="question-number" id="q-number">Q1</span>
+          <span class="question-category" id="q-category">Technical</span>
+          <span class="question-difficulty" id="q-difficulty">Medium</span>
+        </div>
+        <p class="question-text" id="question-text">Loading question...</p>
+        <p class="question-tip hidden" id="question-tip"></p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="interview-body">
+        <div class="video-panel">
+          <video id="interview-video" autoplay muted playsinline></video>
+          <div class="rec-indicator hidden" id="rec-indicator">
+            <span class="rec-dot"></span>
+            <span>REC</span>
+          </div>
+          <div class="video-timer-overlay" id="video-timer-overlay">
+            <span id="overlay-timer">01:00</span>
+          </div>
+        </div>
+
+        <div class="timer-panel">
+          <div class="timer-circle-wrapper">
+            <svg class="timer-svg" viewBox="0 0 200 200">
+              <circle class="timer-track" cx="100" cy="100" r="88" />
+              <circle class="timer-progress" id="timer-circle" cx="100" cy="100" r="88" />
+            </svg>
+            <div class="timer-center">
+              <span class="timer-value" id="timer-value">01:00</span>
+              <span class="timer-label" id="timer-label">Answer Time</span>
+            </div>
+          </div>
+
+          <div class="timer-actions">
+            <button class="btn-secondary btn-sm" id="skip-btn">
+              Skip →
+            </button>
+            <button class="btn-primary btn-sm" id="next-btn">
+              Next Question →
+            </button>
+          </div>
+
+          <div class="keyboard-hints">
+            <span class="hint"><kbd>Space</kbd> Next</span>
+            <span class="hint"><kbd>Esc</kbd> End</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ REVIEW SCREEN ═══════════════ -->
+  <div id="review-screen" class="screen">
+    <div class="review-container">
+      <div class="review-header">
+        <div class="completion-badge">
+          <span class="completion-icon">🎉</span>
+        </div>
+        <h1 class="review-title">Interview Complete!</h1>
+        <p class="review-subtitle">Great job! Review your answers below</p>
+        <div class="review-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="stat-questions">0</span>
+            <span class="stat-label">Questions</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-duration">0:00</span>
+            <span class="stat-label">Total Time</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-recorded">0</span>
+            <span class="stat-label">Recorded</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-actions-top">
+        <button class="btn-secondary" id="download-all-btn">
+          📥 Download All
+        </button>
+        <button class="btn-secondary" id="ai-tips-btn">
+          💡 Get AI Tips & Model Answers
+        </button>
+        <button class="btn-secondary" id="ai-analysis-btn">
+          📊 Performance Analysis
+        </button>
+        <button class="btn-primary" id="new-session-btn">
+          🔄 New Session
+        </button>
+      </div>
+
+      <!-- AI Tips Panel -->
+      <div class="ai-panel glass-card hidden" id="ai-tips-panel">
+        <div class="ai-panel-header">
+          <h3>💡 AI Tips & Model Answers</h3>
+          <button class="btn-close" id="close-tips-btn">✕</button>
+        </div>
+        <div class="ai-panel-content" id="ai-tips-content">
+          <div class="loading-dots"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+
+      <!-- AI Analysis Panel -->
+      <div class="ai-panel glass-card hidden" id="ai-analysis-panel">
+        <div class="ai-panel-header">
+          <h3>📊 Performance Analysis</h3>
+          <button class="btn-close" id="close-analysis-btn">✕</button>
+        </div>
+        <div class="ai-panel-content" id="ai-analysis-content">
+          <div class="loading-dots"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+
+      <!-- Recordings List -->
+      <div class="review-list" id="review-list">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
